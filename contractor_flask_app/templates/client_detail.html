@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}تفاصيل العميل{% endblock %}
+{% block content %}
+<div class="card section-card p-4 mb-4">
+  <div class="d-flex justify-content-between align-items-start">
+    <div>
+      <h3 class="fw-bold">{{ client.name }}</h3>
+      <div class="text-muted">{{ client.client_code }} - {{ client.phone or 'بدون هاتف' }}</div>
+      <div class="mt-2">{{ client.address or '' }}</div>
+    </div>
+    <a href="{{ url_for('clients') }}" class="btn btn-outline-secondary">رجوع</a>
+  </div>
+</div>
+<div class="row g-3 mb-4">
+  <div class="col-md-4"><div class="card stat-card p-3"><div class="text-muted">إجمالي قيمة المشاريع</div><div class="h4 fw-bold">{{ '%.2f'|format(total_project_value) }}</div></div></div>
+  <div class="col-md-4"><div class="card stat-card p-3"><div class="text-muted">إجمالي المدفوعات</div><div class="h4 fw-bold text-success">{{ '%.2f'|format(total_income) }}</div></div></div>
+  <div class="col-md-4"><div class="card stat-card p-3"><div class="text-muted">إجمالي المصروفات المرتبطة</div><div class="h4 fw-bold text-danger">{{ '%.2f'|format(total_expense) }}</div></div></div>
+</div>
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card section-card p-3">
+      <h5 class="fw-bold mb-3">مشاريع العميل</h5>
+      <ul class="list-group list-group-flush">
+        {% for project in client.projects %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <span>{{ project.name }}</span>
+          <a href="{{ url_for('project_detail', project_id=project.id) }}" class="btn btn-sm btn-outline-primary">فتح المشروع</a>
+        </li>
+        {% else %}
+        <li class="list-group-item">لا توجد مشاريع.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card section-card p-3">
+      <h5 class="fw-bold mb-3">السجل المالي</h5>
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead><tr><th>التاريخ</th><th>النوع</th><th>المبلغ</th><th>الوصف</th></tr></thead>
+          <tbody>
+            {% for row in client.transactions %}
+            <tr>
+              <td>{{ row.transaction_date }}</td>
+              <td>{{ 'إيراد' if row.transaction_type == 'income' else 'مصروف' }}</td>
+              <td>{{ '%.2f'|format(row.amount) }}</td>
+              <td>{{ row.description or '-' }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4">لا توجد حركات مالية.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}العملاء{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card section-card p-3">
+      <h5 class="fw-bold mb-3">إضافة عميل</h5>
+      <form method="post" class="row g-2">
+        <div class="col-12"><input name="client_code" class="form-control" placeholder="كود العميل" required></div>
+        <div class="col-12"><input name="name" class="form-control" placeholder="اسم العميل" required></div>
+        <div class="col-12"><input name="phone" class="form-control" placeholder="الهاتف"></div>
+        <div class="col-12"><input name="email" class="form-control" placeholder="البريد الإلكتروني"></div>
+        <div class="col-12"><textarea name="address" class="form-control" placeholder="العنوان"></textarea></div>
+        <div class="col-12"><textarea name="notes" class="form-control" placeholder="ملاحظات"></textarea></div>
+        <div class="col-12"><button class="btn btn-primary w-100">حفظ</button></div>
+      </form>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card section-card p-3">
+      <h5 class="fw-bold mb-3">قائمة العملاء</h5>
+      <div class="table-responsive">
+        <table class="table align-middle table-striped">
+          <thead><tr><th>الكود</th><th>الاسم</th><th>الهاتف</th><th>المشاريع</th><th></th></tr></thead>
+          <tbody>
+            {% for client in clients %}
+            <tr>
+              <td>{{ client.client_code }}</td>
+              <td>{{ client.name }}</td>
+              <td>{{ client.phone or '-' }}</td>
+              <td>{{ client.projects|length }}</td>
+              <td><a class="btn btn-sm btn-outline-primary" href="{{ url_for('client_detail', client_id=client.id) }}">تفاصيل</a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

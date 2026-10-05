@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}لوحة التحكم{% endblock %}
+{% block content %}
+<div class="row g-3 mb-4">
+  <div class="col-md-3"><div class="card stat-card p-3"><div class="text-muted">عدد العملاء</div><div class="display-6 fw-bold">{{ clients_count }}</div></div></div>
+  <div class="col-md-3"><div class="card stat-card p-3"><div class="text-muted">عدد المشاريع</div><div class="display-6 fw-bold">{{ projects_count }}</div></div></div>
+  <div class="col-md-3"><div class="card stat-card p-3"><div class="text-muted">مشاريع تحت التنفيذ</div><div class="display-6 fw-bold">{{ in_progress_count }}</div></div></div>
+  <div class="col-md-3"><div class="card stat-card p-3"><div class="text-muted">مشاريع مكتملة</div><div class="display-6 fw-bold">{{ completed_count }}</div></div></div>
+</div>
+<div class="row g-3 mb-4">
+  <div class="col-md-4"><div class="card stat-card p-3"><div class="text-muted">إجمالي الإيرادات</div><div class="h3 fw-bold text-success">{{ '%.2f'|format(total_income) }}</div></div></div>
+  <div class="col-md-4"><div class="card stat-card p-3"><div class="text-muted">إجمالي المصروفات</div><div class="h3 fw-bold text-danger">{{ '%.2f'|format(total_expense) }}</div></div></div>
+  <div class="col-md-4"><div class="card stat-card p-3"><div class="text-muted">صافي الربح</div><div class="h3 fw-bold text-primary">{{ '%.2f'|format(net_profit) }}</div></div></div>
+</div>
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card section-card p-3">
+      <h5 class="fw-bold mb-3">نسبة تقدم المشاريع</h5>
+      <canvas id="projectChart"></canvas>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card section-card p-3">
+      <h5 class="fw-bold mb-3">متوسط التقدم الشهري</h5>
+      <canvas id="monthlyChart"></canvas>
+    </div>
+  </div>
+</div>
+<div class="row g-4 mt-1">
+  <div class="col-lg-12">
+    <div class="card section-card p-3">
+      <h5 class="fw-bold mb-3">تنبيهات المخزون</h5>
+      {% if low_stock %}
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead><tr><th>الخامة</th><th>الرصيد الحالي</th><th>الحد الأدنى</th></tr></thead>
+          <tbody>
+            {% for item in low_stock %}
+            <tr><td>{{ item.material_name }}</td><td>{{ item.current_stock }}</td><td>{{ item.minimum_stock }}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="text-success">لا توجد خامات منخفضة حاليًا.</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+<script>
+new Chart(document.getElementById('projectChart'), {
+  type: 'bar',
+  data: { labels: {{ project_labels|tojson }}, datasets: [{ label: 'نسبة التقدم', data: {{ project_progress|tojson }}, backgroundColor: '#2563eb' }] },
+  options: { scales: { y: { beginAtZero: true, max: 100 } } }
+});
+new Chart(document.getElementById('monthlyChart'), {
+  type: 'line',
+  data: { labels: {{ monthly_labels|tojson }}, datasets: [{ label: 'متوسط التقدم', data: {{ monthly_progress|tojson }}, borderColor: '#16a34a', backgroundColor: 'rgba(22,163,74,.2)', fill: true }] },
+  options: { scales: { y: { beginAtZero: true, max: 100 } } }
+});
+</script>
+{% endblock %}

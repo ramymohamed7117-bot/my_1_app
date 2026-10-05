@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}المشاريع{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card section-card p-3">
+      <h5 class="fw-bold mb-3">إضافة مشروع</h5>
+      <form method="post" class="row g-2">
+        <div class="col-12"><input name="project_code" class="form-control" placeholder="كود المشروع" required></div>
+        <div class="col-12"><input name="name" class="form-control" placeholder="اسم المشروع" required></div>
+        <div class="col-12">
+          <select name="client_id" class="form-select" required>
+            <option value="">اختر العميل</option>
+            {% for client in clients %}<option value="{{ client.id }}">{{ client.name }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="col-12"><input name="location" class="form-control" placeholder="الموقع"></div>
+        <div class="col-6"><input type="date" name="start_date" class="form-control"></div>
+        <div class="col-6"><input type="date" name="expected_end_date" class="form-control"></div>
+        <div class="col-6"><input name="contract_value" type="number" step="0.01" class="form-control" placeholder="قيمة التعاقد"></div>
+        <div class="col-6"><input name="estimated_cost" type="number" step="0.01" class="form-control" placeholder="التكلفة التقديرية"></div>
+        <div class="col-12">
+          <select name="status" class="form-select">
+            <option value="planned">مخطط</option>
+            <option value="in_progress">تحت التنفيذ</option>
+            <option value="completed">مكتمل</option>
+            <option value="on_hold">متوقف</option>
+          </select>
+        </div>
+        <div class="col-12"><textarea name="description" class="form-control" placeholder="وصف المشروع"></textarea></div>
+        <div class="col-12"><button class="btn btn-primary w-100">حفظ</button></div>
+      </form>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card section-card p-3">
+      <h5 class="fw-bold mb-3">قائمة المشاريع</h5>
+      <div class="table-responsive">
+        <table class="table align-middle table-striped">
+          <thead><tr><th>الكود</th><th>المشروع</th><th>العميل</th><th>الحالة</th><th>التقدم</th><th></th></tr></thead>
+          <tbody>
+            {% for project in projects %}
+            <tr>
+              <td>{{ project.project_code }}</td>
+              <td>{{ project.name }}</td>
+              <td>{{ project.client.name }}</td>
+              <td>{{ project.status }}</td>
+              <td style="min-width:180px;">
+                <div class="progress"><div class="progress-bar" style="width: {{ project.progress_percent }}%"></div></div>
+                <small>{{ project.progress_percent }}%</small>
+              </td>
+              <td><a class="btn btn-sm btn-outline-primary" href="{{ url_for('project_detail', project_id=project.id) }}">تفاصيل</a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

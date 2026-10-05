@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}المستخدمون{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card section-card p-3">
+      <h5 class="fw-bold mb-3">إضافة مستخدم</h5>
+      <form method="post" class="row g-2">
+        <div class="col-12"><input name="full_name" class="form-control" placeholder="الاسم الكامل" required></div>
+        <div class="col-12"><input name="username" class="form-control" placeholder="اسم المستخدم" required></div>
+        <div class="col-12"><input type="password" name="password" class="form-control" placeholder="كلمة المرور" required></div>
+        <div class="col-12"><select name="role_id" class="form-select">{% for role in roles %}<option value="{{ role.id }}">{{ role.name }}</option>{% endfor %}</select></div>
+        <div class="col-12"><button class="btn btn-primary w-100">حفظ</button></div>
+      </form>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card section-card p-3">
+      <h5 class="fw-bold mb-3">قائمة المستخدمين</h5>
+      <table class="table table-striped">
+        <thead><tr><th>الاسم</th><th>اسم المستخدم</th><th>الدور</th><th>تاريخ الإنشاء</th></tr></thead>
+        <tbody>
+          {% for user in users %}
+          <tr><td>{{ user.full_name }}</td><td>{{ user.username }}</td><td>{{ user.role.name if user.role else '-' }}</td><td>{{ user.created_at.strftime('%Y-%m-%d') }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

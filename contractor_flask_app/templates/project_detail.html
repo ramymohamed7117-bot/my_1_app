@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block title %}تفاصيل المشروع{% endblock %}
+{% block content %}
+<div class="card section-card p-4 mb-4">
+  <div class="d-flex justify-content-between align-items-start">
+    <div>
+      <h3 class="fw-bold">{{ project.name }}</h3>
+      <div class="text-muted">{{ project.project_code }} - العميل: {{ project.client.name }}</div>
+      <div class="mt-2">الموقع: {{ project.location or '-' }}</div>
+      <div>الحالة: {{ project.status }}</div>
+    </div>
+    <div class="text-start">
+      <div class="text-muted">نسبة التقدم</div>
+      <div class="display-6 fw-bold text-primary">{{ project.progress_percent }}%</div>
+    </div>
+  </div>
+</div>
+<div class="row g-3 mb-4">
+  <div class="col-md-4"><div class="card stat-card p-3"><div class="text-muted">قيمة التعاقد</div><div class="h4 fw-bold">{{ '%.2f'|format(project.contract_value or 0) }}</div></div></div>
+  <div class="col-md-4"><div class="card stat-card p-3"><div class="text-muted">إيرادات المشروع</div><div class="h4 fw-bold text-success">{{ '%.2f'|format(total_income) }}</div></div></div>
+  <div class="col-md-4"><div class="card stat-card p-3"><div class="text-muted">مصروفات المشروع</div><div class="h4 fw-bold text-danger">{{ '%.2f'|format(total_expenses) }}</div></div></div>
+</div>
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="card section-card p-3 mb-4">
+      <h5 class="fw-bold mb-3">مراحل المشروع</h5>
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead><tr><th>المرحلة</th><th>الوزن</th><th>التقدم</th><th>الحالة</th></tr></thead>
+          <tbody>
+            {% for phase in project.phases %}
+            <tr>
+              <td>{{ phase.phase_name }}</td>
+              <td>{{ phase.weight_percent }}%</td>
+              <td>{{ phase.progress_percent }}%</td>
+              <td>{{ phase.status }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4">لا توجد مراحل بعد.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <hr>
+      <form method="post" class="row g-2">
+        <input type="hidden" name="form_type" value="phase">
+        <div class="col-md-4"><input name="phase_name" class="form-control" placeholder="اسم المرحلة" required></div>
+        <div class="col-md-2"><input name="weight_percent" type="number" step="0.01" class="form-control" placeholder="الوزن"></div>
+        <div class="col-md-2"><input name="progress_percent" type="number" step="0.01" class="form-control" placeholder="التقدم"></div>
+        <div class="col-md-2">
+          <select name="status" class="form-select">
+            <option value="not_started">لم تبدأ</option>
+            <option value="in_progress">جارية</option>
+            <option value="completed">مكتملة</option>
+          </select>
+        </div>
+        <div class="col-md-2"><button class="btn btn-primary w-100">إضافة</button></div>
+      </form>
+    </div>
+    <div class="card section-card p-3">
+      <h5 class="fw-bold mb-3">سجل التقدم</h5>
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead><tr><th>التاريخ</th><th>المخطط</th><th>الفعلي</th><th>المنجز</th><th>المتبقي</th></tr></thead>
+          <tbody>
+            {% for row in project.progress_logs %}
+            <tr>
+              <td>{{ row.log_date }}</td>
+              <td>{{ row.planned_percent }}%</td>
+              <td>{{ row.actual_percent }}%</td>
+              <td>{{ row.completed_work_desc or '-' }}</td>
+              <td>{{ row.remaining_work_desc or '-' }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5">لا توجد سجلات متابعة.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <hr>
+      <form method="post" class="row g-2">
+        <input type="hidden" name="form_type" value="progress_log">
+        <div class="col-md-2"><input type="date" name="log_date" class="form-control"></div>
+        <div class="col-md-2"><input name="planned_percent" type="number" step="0.01" class="form-control" placeholder="المخطط"></div>
+        <div class="col-md-2"><input name="actual_percent" type="number" step="0.01" class="form-control" placeholder="الفعلي"></div>
+        <div class="col-md-3"><input name="completed_work_desc" class="form-control" placeholder="المنجز"></div>
+        <div class="col-md-3"><input name="remaining_work_desc" class="form-control" placeholder="المتبقي"></div>
+        <div class="col-12"><input name="delay_reason" class="form-control" placeholder="سبب التأخير إن وجد"></div>
+        <div class="col-12"><button class="btn btn-success">إضافة سجل متابعة</button></div>
+      </form>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="card section-card p-3">
+      <h5 class="fw-bold mb-3">رسم مراحل التنفيذ</h5>
+      <canvas id="phaseChart"></canvas>
+    </div>
+    <div class="card section-card p-3 mt-4">
+      <h5 class="fw-bold mb-3">الخامات المصروفة</h5>
+      <ul class="list-group list-group-flush">
+        {% for move in project.inventory_movements %}
+        <li class="list-group-item">{{ move.material.material_name }} - {{ move.quantity }} {{ move.material.unit }} ({{ move.movement_type }})</li>
+        {% else %}
+        <li class="list-group-item">لا توجد حركات مخزنية مرتبطة بالمشروع.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+<script>
+new Chart(document.getElementById('phaseChart'), {
+  type: 'doughnut',
+  data: { labels: {{ phase_labels|tojson }}, datasets: [{ data: {{ phase_progress|tojson }}, backgroundColor: ['#2563eb','#16a34a','#f59e0b','#dc2626','#7c3aed','#0891b2'] }] }
+});
+</script>
+{% endblock %}

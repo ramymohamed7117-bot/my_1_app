@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}الخامات{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card section-card p-3">
+      <h5 class="fw-bold mb-3">إضافة خامة</h5>
+      <form method="post" class="row g-2">
+        <div class="col-12"><input name="material_code" class="form-control" placeholder="كود الخامة" required></div>
+        <div class="col-12"><input name="material_name" class="form-control" placeholder="اسم الخامة" required></div>
+        <div class="col-12"><input name="category" class="form-control" placeholder="التصنيف"></div>
+        <div class="col-4"><input name="unit" class="form-control" placeholder="الوحدة"></div>
+        <div class="col-4"><input name="minimum_stock" type="number" step="0.01" class="form-control" placeholder="حد أدنى"></div>
+        <div class="col-4"><input name="current_stock" type="number" step="0.01" class="form-control" placeholder="رصيد أولي"></div>
+        <div class="col-12"><input name="average_cost" type="number" step="0.01" class="form-control" placeholder="متوسط التكلفة"></div>
+        <div class="col-12"><button class="btn btn-primary w-100">حفظ</button></div>
+      </form>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card section-card p-3">
+      <h5 class="fw-bold mb-3">قائمة الخامات</h5>
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead><tr><th>الكود</th><th>الخامة</th><th>التصنيف</th><th>الوحدة</th><th>الرصيد الحالي</th><th>الحد الأدنى</th></tr></thead>
+          <tbody>
+            {% for item in materials %}
+            <tr>
+              <td>{{ item.material_code }}</td>
+              <td>{{ item.material_name }}</td>
+              <td>{{ item.category or '-' }}</td>
+              <td>{{ item.unit }}</td>
+              <td>{{ item.current_stock }}</td>
+              <td>{{ item.minimum_stock }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
